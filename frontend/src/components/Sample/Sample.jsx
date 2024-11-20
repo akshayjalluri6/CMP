@@ -19,7 +19,7 @@ const Sample = () => {
     }, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiM2JhY2Q4NjQtMDBiNS00YmZmLThhOGItOGFiNTgxNzNmZDkwIiwiaWF0IjoxNzMyMDMxNDc2LCJleHAiOjE3MzIxMTc4NzZ9.K5Zp59IMTTSkr-zo3-vkqBPy6R8rL18aqSX0sagxTuE'
+            'Authorization': 'Bearer '
         }
     });
 
