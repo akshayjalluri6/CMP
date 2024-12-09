@@ -40,7 +40,7 @@ app.post('/login', async(req, res) => {
         const token = await UserModel.userLogin(email, password);
         res.status(200).send({token: token});
     } catch (error) {
-        res.status(400).send(error);
+        res.status(400).send(`${error}`);
     }
 })
 

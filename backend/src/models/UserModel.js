@@ -76,7 +76,7 @@ const UserModel = {
             const isPasswordValid = await bcrypt.compare(password, user.rows[0].password);
 
             if(!isPasswordValid) {
-                throw "Invalid Password";
+                throw  new Error("Invalid Password");
             }
 
             //Generate JWT
