@@ -1,13 +1,24 @@
 import pool from "../db/db.js";
-import bcrypt from "bcrypt"
 
 const VendorModel = {
     async createVendorTable() {
         const query = `
         CREATE TABLE IF NOT EXISTS vendors (
         bank_account_no VARCHAR(255) NOT NULL,
-        bank_name VARCHAR(255) NOT NULL,
+        account_holder_name VARCHAR(255) NOT NULL,
         ifsc_code VARCHAR(255) NOT NULL,
+        bank_name VARCHAR(255) NOT NULL,
+        working_days VARCHAR(255) NOT NULL,
+        base_amount FLOAT NOT NULL,
+        total_kms FLOAT NOT NULL,
+        kms_amount FLOAT NOT NULL,
+        total_tolls INT NOT NULL,
+        sum_of_diesel FLOAT NOT NULL,
+        sum_of_vendor_advances FLOAT,
+        absent_or_debit_charges FLOAT,
+        total_amount FLOAT NOT NULL,
+        TDS FLOAT NOT NULL,
+        grand_total FLOAT NOT NULL,
         user_id UUID UNIQUE,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP NOT NULL DEFAULT NOW(),

@@ -5,11 +5,11 @@ const RidesModel = {
         const query = `
         CREATE TABLE IF NOT EXISTS rides(
         id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        client_name VARCHAR(255) NOT NULL,
         duration INT NOT NULL,
         remaining_days INT DEFAULT 0,
-        route_id UUID,
         cost_per_day FLOAT NOT NULL,
-        FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
+        remarks VARCHAR(255),
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
         );
@@ -23,15 +23,15 @@ const RidesModel = {
         }
     },
 
-    async addRide(duration, route_id, cost_per_day){
+    async addRide(client_name, duration, cost_per_day){
         const remaining_days = duration
         const query = `
-        INSERT INTO rides(duration, remaining_days, route_id, cost_per_day)
-        VALUES($1,$2,$3, $4);
+        INSERT INTO rides(client_name, duration, remaining_days, cost_per_day)
+        VALUES($1, $2, $3, $4);
         `;
 
         try {
-            const values = [duration, remaining_days, route_id, cost_per_day];
+            const values = [client_name, duration, remaining_days, cost_per_day];
             await pool.query(query, values);
             return "Ride added successfully";
         } catch (error) {

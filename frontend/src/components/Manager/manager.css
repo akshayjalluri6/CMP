@@ -1,0 +1,32 @@
+.manager-container{
+    padding: 10px;
+    height: auto;
+}
+
+.manager-container div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-ride-button{
+    background-color: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-ride-icon{
+    margin-right: 5px;
+}
+
+.rides-list-container{
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    margin-top: 10px;
+    overflow: scroll;
+    max-height: 620px;
+}

@@ -8,6 +8,9 @@ const startDailyJobLog = () => {
     cron.schedule("* * * * *", async () => {
         try {
             const activeRides = await RidesModel.getActiveRides();
+            if (activeRides.length === 0) {
+                return console.log("No active rides");
+            }
             for(const ride of activeRides){
                 const lastLog = await DailyLogsModel.getLastLog(ride.id);
                 console.log(lastLog)

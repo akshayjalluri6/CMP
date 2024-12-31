@@ -24,15 +24,15 @@ const VehicleModel = {
         }
     },
 
-    async createVehicle(vehicle_no, vehicle_type, vehicle_model, vendor_id, status){
+    async createVehicle(vehicle_no, vehicle_type, vehicle_model, status){
         const query = `
-        INSERT INTO vehicles (vehicle_no, vehicle_type, vehicle_model, vendor_id, status)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO vehicles (vehicle_no, vehicle_type, vehicle_model, status)
+        VALUES ($1, $2, $3, $4)
         RETURNING *;
         `;
 
         try {
-            const values = [vehicle_no, vehicle_type, vehicle_model, vendor_id, status];
+            const values = [vehicle_no, vehicle_type, vehicle_model, status];
             await pool.query(query, values);
             return "Vehicle created successfully";
         } catch (error) {
@@ -96,6 +96,20 @@ const VehicleModel = {
             const result = await pool.query(query, values);
             console.log(result.rows[0]);
             return result.rows[0];
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async updateVehicle(vehicle_no, vendor_id){
+        const query = `
+        UPDATE vehicles SET vendor_id = $1 WHERE vehicle_no = $2;
+        `;
+
+        try {
+            const values = [vendor_id, vehicle_no];
+            await pool.query(query, values);
+            return "Vehicle updated successfully";
         } catch (error) {
             throw error
         }

@@ -7,7 +7,6 @@ import VendorModel from './models/VendorModel.js'
 import VehicleModel from './models/VehicleModel.js'
 import MaintenanceModel from './models/MaintenanceModel.js'
 import authenticateToken from './middlewares/auth.middleware.js'
-import RouteModel from './models/RouteModel.js'
 import RidesModel from './models/RidesModel.js'
 import DailyLogsModel from './models/DailyLogsModel.js'
 import AttendanceModel from './models/AttendanceModel.js'
@@ -110,22 +109,33 @@ app.post('/register-supervisor', authenticateToken, async(req, res) => {
     }
 })
 
-app.post('/supervisor/add-route', authenticateToken, async(req, res) => {
-    const {source, destination, total_distance, total_tolls, each_toll_price} = req.body;
+app.post('/supervisor/add-vehicle', authenticateToken, async(req, res) => {
+    const {vehicle_no, vehicle_type, vehicle_model, status} = req.body;
+    try {
+        const response = await VehicleModel.createVehicle(vehicle_no, vehicle_type, vehicle_model, status);
+        res.sendStatus(201);
+    } catch (error) {
+        res.status(400).send("Error while adding vehicle: " + error)
+    }
+})
+
+app.put('/supervisor/update-vehicle-info/:id', authenticateToken, async(req, res) => {
+    const {id} = req.params;
+    const {vendor} = req.body;
 
     try {
-        const result = await RouteModel.addRoute(source, destination, total_distance, total_tolls, each_toll_price);
-        res.status(201).send(result);
+        await VehicleModel.updateVehicle(id, vendor);
+        res.sendStatus(200);
     } catch (error) {
-        res.status(400).send("Error while adding route: " + error)
+        res.sendStatus(400);
     }
 })
 
 app.post('/supervisor/add-ride', authenticateToken, async(req, res) => {
-    const {duration, route_id, cost_per_day} = req.body;
+    const {client_name, duration, cost_per_day} = req.body;
 
     try {
-        const result = await RidesModel.addRide(duration, route_id, cost_per_day);
+        const result = await RidesModel.addRide(client_name, duration, cost_per_day);
         res.status(201).send(result);
     } catch (error) {
         res.status(400).send("Error while adding ride: " + error)
@@ -225,15 +235,6 @@ app.get('/get-rides', authenticateToken, async(req, res) => {
     }
 })
 
-app.get('/get-routes', authenticateToken, async(req, res) => {
-    try {
-        const result = await RouteModel.getRoutes();
-        res.status(200).send(result);
-    } catch (error) {
-        res.status(400).send("Error while getting routes: " + error)
-    }
-})
-
 app.get('/get-daily-logs', authenticateToken, async(req, res) => {
     try {
         const result = await DailyLogsModel.getDailyLogs();
@@ -278,7 +279,6 @@ const initializeDBAndServer = async () => {
         await VendorModel.createVendorTable();
         await VehicleModel.createVehicleTable();
         await MaintenanceModel.createMaintenanceTable();
-        await RouteModel.createRoutesTable();
         await RidesModel.createRidesModel();
         await DailyLogsModel.createDailyLogsTable();
         await AttendanceModel.createAttendanceTable();
@@ -290,5 +290,7 @@ const initializeDBAndServer = async () => {
         console.log("Error while intializing DB and Server: " + error)
     }
 }
+
+//startDailyJobLog();
 
 initializeDBAndServer()
