@@ -113,6 +113,21 @@ const UserModel = {
         } catch (error) {
             throw error
         }
+    },
+
+    async getUserById(user_id){
+        const query = `
+        SELECT * FROM users
+        WHERE id = $1;
+        `;
+
+        try {
+            const values = [user_id];
+            const result = await pool.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            throw error
+        }
     }
 }
 

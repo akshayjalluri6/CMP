@@ -119,6 +119,26 @@ app.post('/supervisor/add-vehicle', authenticateToken, async(req, res) => {
     }
 })
 
+app.put('/update-log/:id', authenticateToken, async (req, res) => {
+    const { id: ride_id } = req.params; // Correct param name
+    const { start_time, log_status, start_date} = req.body;
+
+    console.log("Received Payload:", { ride_id, start_time, log_status, start_date });
+
+    if (!ride_id || !start_time || !log_status) {
+        console.error("Missing parameters");
+        return res.status(400).send("Bad Request: Missing parameters");
+    }
+
+    try {
+        const result = await DailyLogsModel.startRide(ride_id, start_time, log_status, start_date);
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error updating log:", error.message);
+        res.status(400).send("Bad Request");
+    }
+});
+
 app.put('/supervisor/update-vehicle-info/:id', authenticateToken, async(req, res) => {
     const {id} = req.params;
     const {vendor} = req.body;
@@ -177,18 +197,6 @@ app.post('/supervisor/add-log', authenticateToken, async(req, res) => {
     }
 })
 
-app.post('/supervisor/start-ride/:id', authenticateToken, async(req, res) => {
-    const {id} = req.params;
-    const {start_time} = req.body;
-
-    try {
-        const result = await DailyLogsModel.startRide(id, start_time);
-        res.status(201).send(result);
-    } catch (error) {
-        res.status(400).send("Error while starting ride: " + error)
-    }
-})
-
 app.post('/supervisor/end-ride/:id', authenticateToken, async(req, res) => {
     const {id} = req.params;
     const {end_time} = req.body;
@@ -235,14 +243,36 @@ app.get('/get-rides', authenticateToken, async(req, res) => {
     }
 })
 
-app.get('/get-daily-logs', authenticateToken, async(req, res) => {
+app.get('/get-ride/:id', authenticateToken, async(req, res) => {
+    const {id} = req.params;
     try {
-        const result = await DailyLogsModel.getDailyLogs();
+        const result = await RidesModel.getRideById(id);
         res.status(200).send(result);
     } catch (error) {
-        res.status(400).send("Error while getting daily logs: " + error)
+        res.status(400).send("Error while getting ride details: " + error)
     }
 })
+
+app.get('/get-user/:id', authenticateToken, async(req, res) => {
+    const {id} = req.params;
+
+    try {
+        const result = await UserModel.getUserById(id);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting user: " + error)
+    }
+})
+
+app.get('/get-daily-logs', async (req, res) => {
+    try {
+        const result = await DailyLogsModel.getLogs();
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error while getting daily logs:", error);
+        res.status(400).send("Error while getting daily logs: " + error.message);
+    }
+});
 
 app.get('/get-attendances', authenticateToken, async(req, res) => {
     try {
@@ -250,6 +280,16 @@ app.get('/get-attendances', authenticateToken, async(req, res) => {
         res.status(200).send(result);
     } catch (error) {
         res.status(400).send("Error while getting attendaces: " + error)
+    }
+})
+
+app.get('/get-vehicle-type/:id', authenticateToken, async(req,res) => {
+    const {id} = req.params;
+    try {
+        const result = await VehicleModel.getVehicleType(id);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting vehicle type: " + error)
     }
 })
 
@@ -268,6 +308,16 @@ app.get('/get-absents', authenticateToken, async(req, res) => {
         res.status(200).send(result);
     } catch (error) {
         res.status(400).send("Error while getting absents: " + error)
+    }
+})
+
+app.get('/get-daily-logs-by-date', authenticateToken, async(req, res) => {
+    const {date} = req.query;
+    try {
+        const result = await DailyLogsModel.getDailyLogsByDate(date);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting daily logs by date: " + error)
     }
 })
 

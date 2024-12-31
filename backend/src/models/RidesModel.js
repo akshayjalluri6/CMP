@@ -52,6 +52,22 @@ const RidesModel = {
         }
     },
 
+    //Get Ride by ID
+    async getRideById(id){
+        const query = `
+        SELECT * FROM rides
+        WHERE id = $1;
+        `;
+
+        try {
+            const values = [id];
+            const result = await pool.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            throw error
+        }
+    },
+
     async getActiveRides(){
         const query = `
         SELECT * FROM rides

@@ -7,8 +7,8 @@ const DailyLogsModel = {
         CREATE TABLE IF NOT EXISTS daily_logs(
         ride_id UUID,
         start_date DATE NOT NULL,
-        start_time TIMESTAMP,
-        end_time TIMESTAMP,
+        start_time TIME,
+        end_time TIME,
         vehicle_no VARCHAR(255) NOT NULL,
         driver_id UUID NOT NULL,
         vendor_id UUID,
@@ -33,12 +33,27 @@ const DailyLogsModel = {
         const query = `
         SELECT * FROM daily_logs;
         `;
+        console.log("Hello")
 
         try {
             const result = await pool.query(query);
+            console.log(result)
             return result.rows;
         } catch (error) {
             throw error
+        }
+    },
+
+    async getLogs (){
+        const query = `
+        SELECT * FROM daily_logs;
+        `;
+
+        try {
+            const result = await pool.query(query);
+            return result.rows
+        } catch (error) {
+            throw error;
         }
     },
 
@@ -126,16 +141,15 @@ const DailyLogsModel = {
         }
     },
 
-    async startRide(ride_id, start_time){
-        const start_date = new Date().toISOString().split('T')[0];
+    async startRide(ride_id, start_time, log_status, start_date){
         const query = `
         UPDATE daily_logs
-        SET start_time = $1
-        WHERE ride_id = $2 AND start_date = $3;
+        SET start_time = $1, log_status = $2
+        WHERE ride_id = $3 AND start_date = $4;
         `;
 
         try {
-            const values = [start_time, ride_id, start_date];
+            const values = [start_time, log_status, ride_id, start_date];
             await pool.query(query, values);
             return "Ride started successfully";
         } catch (error) {
@@ -164,6 +178,21 @@ const DailyLogsModel = {
             return "Ride ended successfully";
         } catch (error) {
             throw error;
+        }
+    },
+
+    async getDailyLogsByDate(date){
+        const query = `
+        SELECT * FROM daily_logs
+        WHERE DATE(start_date) = $1;
+        `;
+
+        try {
+            const values = [date];
+            const result = await pool.query(query, values);
+            return result.rows;
+        } catch (error) {
+            throw error
         }
     }
 };
