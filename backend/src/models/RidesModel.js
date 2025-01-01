@@ -23,7 +23,7 @@ const RidesModel = {
         }
     },
 
-    async addRide(client_name, duration, cost_per_day){
+    /*async addRide(client_name, duration, cost_per_day){
         const remaining_days = duration
         const query = `
         INSERT INTO rides(client_name, duration, remaining_days, cost_per_day)
@@ -32,7 +32,24 @@ const RidesModel = {
 
         try {
             const values = [client_name, duration, remaining_days, cost_per_day];
-            await pool.query(query, values);
+            const result =await pool.query(query, values);
+            console.log(result.rows)
+            return "Ride added successfully";
+        } catch (error) {
+            throw error
+        }
+    },*/
+
+    async addRides(client_name, duration, cost_per_day){
+        const query = `
+        INSERT INTO rides(client_name, duration, cost_per_day)
+        VALUES($1, $2, $3);
+        `;
+
+        try {
+            const values = [client_name, duration, cost_per_day];
+            const result = await pool.query(query, values);
+            console.log(result.rows)
             return "Ride added successfully";
         } catch (error) {
             throw error

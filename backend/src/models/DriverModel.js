@@ -80,6 +80,21 @@ const DriverModel = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async updateDriverStatus(driver_id, status){
+        const query = `
+        UPDATE drivers SET status = $1
+        WHERE user_id = $2;
+        `;
+
+        try {
+            const values = [status, driver_id];
+            await pool.query(query, values);
+            return "Driver status updated successfully";
+        } catch (error) {
+            throw error
+        }
     }
 }
 

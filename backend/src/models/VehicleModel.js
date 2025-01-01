@@ -70,9 +70,9 @@ const VehicleModel = {
         }
     },
 
-    async getVehicleType(vehicle_no){
+    async getVehicleDetails(vehicle_no){
         const query = `
-        SELECT vehicle_type FROM vehicles
+        SELECT * FROM vehicles
         WHERE vehicle_no = $1;
         `;
 
@@ -111,6 +111,50 @@ const VehicleModel = {
             await pool.query(query, values);
             return "Vehicle updated successfully";
         } catch (error) {
+            throw error
+        }
+    },
+
+    async updateVehicleStatus(vehicle_no, status){
+        const query = `
+        UPDATE vehicles SET status = $1 WHERE vehicle_no = $2;
+        `;
+
+        try {
+            const values = [status, vehicle_no];
+            await pool.query(query, values);
+            return "Vehicle status updated successfully";
+        } catch (error){
+            throw error
+        }
+    },
+
+    async getVehiclesForBackup(vehicle_type) {
+        const query = `
+        SELECT * FROM vehicles
+        WHERE status = 'available' AND vehicle_type = $1;
+        `;
+
+        try {
+            const values = [vehicle_type];
+            const result = await pool.query(query, values);
+            return result.rows;
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async searchVehicles(vehicle_no) {
+        const query = `
+        SELECT * FROM vehicles
+        WHERE LOWER(vehicle_no) LIKE $1 LIMIT 10;
+        `;
+
+        try {
+            const value = `%${vehicle_no}%`;
+            const result = await pool.query(query, [value]);
+            return result.rows;
+        } catch(error){
             throw error
         }
     }

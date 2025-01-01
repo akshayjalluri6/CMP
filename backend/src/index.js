@@ -155,7 +155,7 @@ app.post('/supervisor/add-ride', authenticateToken, async(req, res) => {
     const {client_name, duration, cost_per_day} = req.body;
 
     try {
-        const result = await RidesModel.addRide(client_name, duration, cost_per_day);
+        const result = await RidesModel.addRides(client_name, duration, cost_per_day);
         res.status(201).send(result);
     } catch (error) {
         res.status(400).send("Error while adding ride: " + error)
@@ -283,10 +283,10 @@ app.get('/get-attendances', authenticateToken, async(req, res) => {
     }
 })
 
-app.get('/get-vehicle-type/:id', authenticateToken, async(req,res) => {
+app.get('/get-vehicle-details/:id', authenticateToken, async(req,res) => {
     const {id} = req.params;
     try {
-        const result = await VehicleModel.getVehicleType(id);
+        const result = await VehicleModel.getVehicleDetails(id);
         res.status(200).send(result);
     } catch (error) {
         res.status(400).send("Error while getting vehicle type: " + error)
@@ -321,6 +321,26 @@ app.get('/get-daily-logs-by-date', authenticateToken, async(req, res) => {
     }
 })
 
+app.get('/get-vehicles-for-backup', authenticateToken, async(req, res) => {
+    const {vehicle_type} = req.query
+   try {
+       const result = await VehicleModel.getVehiclesForBackup(vehicle_type);
+       res.status(200).send(result);
+   } catch (error) {
+    res.status(400).send("Error while getting vehicles for backup: " + error)
+   }
+})
+
+app.get('/search-vehicles', authenticateToken, async(req, res) => {
+    const {query} = req.query;
+
+    try {
+        const result = await VehicleModel.searchVehicles(query);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while searching vehicles: " + error)
+    }
+})
 //Initialize DB and Server
 const initializeDBAndServer = async () => {
     try {

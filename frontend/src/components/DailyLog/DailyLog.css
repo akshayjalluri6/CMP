@@ -130,3 +130,132 @@ button:hover {
     color: #333;
     padding: 5px;
 }
+
+.popup-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    width: 100%;
+    height: -50%;
+    max-width: 600px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    animation: slideUp 0.3s ease-in-out;
+}
+
+.popup-header .drag-bar {
+    width: 50px;
+    height: 5px;
+    background-color: #ccc;
+    border-radius: 5px;
+    margin: 5px auto;
+    cursor: grab;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.popup-content h2 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.popup-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.popup-close-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.popup-close-button:hover {
+    background-color: #0056b3;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.close-icon {
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #333;
+    z-index: 10;
+    transition: color 0.3s;
+}
+
+.close-icon:hover {
+    color: #007bff;
+}
+
+.search-input{
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus{
+    border-color: #007bff;
+}
+
+.dropdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dropitem-item:hover{
+    background-color: #f9f9f9;
+}
+
+.no-results{
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-top: 10px;
+}

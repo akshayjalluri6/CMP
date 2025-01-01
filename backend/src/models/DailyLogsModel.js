@@ -1,5 +1,7 @@
 import pool from "../db/db.js";
+import DriverModel from "./DriverModel.js";
 import RidesModel from "./RidesModel.js";
+import VehicleModel from "./VehicleModel.js";
 
 const DailyLogsModel = {
     async createDailyLogsTable(){
@@ -82,6 +84,8 @@ const DailyLogsModel = {
             const date = new Date(start_date).toISOString().split('T')[0];
             const values = [ride_id, date, start_time, vehicle_no, driver_id, vendor_id];
             await pool.query(query, values);
+            await DriverModel.updateDriverStatus(driver_id, "busy");
+            await VehicleModel.updateVehicleStatus(vehicle_no, "busy");
             return "Daily log added successfully";
         } catch (error) {
             throw error;
