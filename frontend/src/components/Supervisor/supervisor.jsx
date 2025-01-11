@@ -144,6 +144,7 @@ const Supervisor = () => {
                     Authorization: `Bearer ${Cookies.get('jwt_token')}`
                 }
             });
+            console.log(response.data)
             setFormData(response.data); // Update state with fetched logs
             setSelectedDate(formattedDate); // Update selected date
         } catch (error) {
@@ -241,7 +242,7 @@ const Supervisor = () => {
                     <>
                         <ul className='daily-logs-container'>
                             {formData.map((log, index) => (
-                                <DailyLog key={index} log={log} onUpdateLog={handleLogUpdate} />
+                                <DailyLog key={index} log={log} selectedDate={selectedDate} onUpdateLog={handleLogUpdate} />
                             ))}
                         </ul>
                     </>
@@ -267,7 +268,7 @@ const Supervisor = () => {
                     &times;
                 </button>
             </div>
-            <form onSubmit={handleSubmitNewRide} className="popup-content">
+            <form id="add-ride-form" onSubmit={handleSubmitNewRide} className="popup-content">
                 <label htmlFor="vehicle_no">Vehicle Number:</label>
                 <input
                     type="text"

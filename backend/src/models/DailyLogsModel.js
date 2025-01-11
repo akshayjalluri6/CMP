@@ -198,6 +198,22 @@ const DailyLogsModel = {
         } catch (error) {
             throw error
         }
+    },
+
+    async getRideDetails(id, date){
+        const query = `
+        SELECT * FROM daily_logs
+        WHERE ride_id = $1 AND DATE(start_date) = $2;
+        `;
+
+        try {
+            const values = [id, date];
+            const result = await pool.query(query, values);
+            console.log(result.rows)
+            return result.rows
+        } catch (error) {
+            throw error
+        }
     }
 };
 

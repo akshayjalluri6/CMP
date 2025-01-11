@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GrUserWorker } from 'react-icons/gr';
-import { FaPhoneAlt, FaTruck } from 'react-icons/fa';
+import { FaPhoneAlt, FaTruck, FaEdit } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5'; // Close icon
 import Cookies from 'js-cookie';
 import 'react-time-picker/dist/TimePicker.css';
+import { useNavigate } from 'react-router-dom';
 import './DailyLog.css';
 
 const DailyLog = (props) => {
-    const { log, onUpdateLog } = props;
+    const { log, onUpdateLog, selectedDate } = props;
     const { log_status, start_time, ride_id, vehicle_no, driver_id } = log;
 
     const [clientName, setClientName] = useState("Loading...");
@@ -26,6 +27,10 @@ const DailyLog = (props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredVehicles, setFilteredVehicles] = useState([]);
     const [selectedBackupVehicle, setSelectedBackupVehicle] = useState(null); // Selected backup vehicle
+    const navigate = useNavigate();
+
+    const startDate = selectedDate;
+    
 
     useEffect(() => {
         const fetchDriverName = async () => {
@@ -137,9 +142,17 @@ const DailyLog = (props) => {
         setFilteredVehicles([])
     };
 
+    const onRideDetails = () => {
+        console.log('Ride details clicked');
+        navigate(`/ride-details/${ride_id}/${startDate}`);
+    }
+
     return (
-        <div className="daily-log">
+        <li className="daily-log">
+            <div className='client-name-edit-btn-con'>
             <h1>{clientName}</h1>
+                <FaEdit color='black' onClick={onRideDetails} style={{cursor: 'pointer'}}/>
+            </div>
             <div className="ride-client-details">
                 <p>
                     <strong>Ride ID:</strong> {ride_id}
@@ -246,7 +259,7 @@ const DailyLog = (props) => {
                     </div>
                 </div>
             )}
-        </div>
+        </li>
     );
 };
 

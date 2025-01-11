@@ -253,6 +253,18 @@ app.get('/get-ride/:id', authenticateToken, async(req, res) => {
     }
 })
 
+app.get('/ride-details/:ride_id/:start_date', authenticateToken, async (req, res) => {
+    const { ride_id, start_date } = req.params;
+    console.log(ride_id)
+    console.log(start_date)
+    try {
+        const result = await DailyLogsModel.getRideDetails(ride_id, start_date);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting ride details: " + error);
+    }
+});
+
 app.get('/get-user/:id', authenticateToken, async(req, res) => {
     const {id} = req.params;
 
