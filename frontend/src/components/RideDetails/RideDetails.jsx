@@ -22,6 +22,7 @@ const RideDetails = () => {
         vehicle_attributes: "",
         driver_name: "",
         driver_contact_number: "",
+        final_attendance: "",
         trip_type: "Single Point",
         is_24hr_trip: "No",
         total_distance: "",
@@ -38,6 +39,7 @@ const RideDetails = () => {
                     }
                 });
                 const data = response.data;
+                console.log(data)
 
                 if (data[0]) {
                     setFormData({
@@ -53,6 +55,7 @@ const RideDetails = () => {
                         vehicle_attributes: data[0].vehicle_attributes || "",
                         driver_name: data[0].driver_name || "",
                         driver_contact_number: data[0].driver_contact_number || "",
+                        final_attendance: data[0].log_status || "",
                         trip_type: data[0].trip_type || "Single Point",
                         is_24hr_trip: data[0].is_24hr_trip || "No",
                         total_distance: data[0].total_distance || "",
@@ -190,6 +193,14 @@ const RideDetails = () => {
                     name='driver_contact_number'
                     value={formData.driver_contact_number}
                     onChange={handleChange}
+                />
+                <label className='ride-details-label' htmlFor='final_attendance'>Final Attendance</label>
+                <input 
+                    className='ride-details-input'
+                    name='final_attendance'
+                    value={formData.final_attendance}
+                    onChange={handleChange}
+                    readOnly
                 />
                 <label className='ride-details-label'>Trip Type</label>
                 <div className='trip-type-options'>
