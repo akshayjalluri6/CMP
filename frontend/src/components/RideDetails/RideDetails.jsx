@@ -29,6 +29,10 @@ const RideDetails = () => {
         total_time: "",
     });
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredPartners, setFilteredPartners] = useState([]);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+
     useEffect(() => {
         const fetchRideDetails = async () => {
             try {
@@ -70,6 +74,38 @@ const RideDetails = () => {
         fetchRideDetails();
     }, [ride_id, date]);
 
+
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return(...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func(...args);
+            }, delay)
+        };
+    };
+
+    const fetchFilteredPartners = async (query) => {
+        if(!query) {
+            setFilteredPartners([]);
+            return;
+        }
+
+        try {
+            const response = await axios.get(`http://localhost:8080/partners/?query=${query}`, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('jwt_token')}`,
+                },
+            });
+            console.log(response.data)
+            setFilteredPartners(response.data);
+        } catch (error) {
+            toast.error(`Error fetching partners: ${error.message}`);
+        }
+    }
+
+    const debouncedFetchPartners = debounce(fetchFilteredPartners, 500)
+
     // Generic handler for form changes
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -78,6 +114,20 @@ const RideDetails = () => {
             [name]: value,
         }));
     };
+
+    const handlePartnerChange = (e) => {
+        const query = e.target.value;
+        setSearchTerm(query);
+        setFormData((prevData) => ({
+            ...prevData,
+            partner_name: '',
+            partner_number: "",
+        }))
+        setShowSearchResults(true)
+        debouncedFetchPartners(query.toLowerCase());
+    }
+
+
 
     const onUpdateRideDetails = async (e) => {
         e.preventDefault();
@@ -95,6 +145,15 @@ const RideDetails = () => {
             toast.error(`Error updating ride details: ${error.message}`);
         }
     };
+
+    const selectPartner = (data) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            partner_name: data.name,
+            partner_number: data.phone_no,
+        }));
+        setShowSearchResults(false);
+    }
 
     return (
         <div className='ride-details-container'>
@@ -119,11 +178,25 @@ const RideDetails = () => {
                 />
                 <label className='ride-details-label' htmlFor='partner_name'>Partner Name</label>
                 <input
+                    type='search'
                     className='ride-details-input'
                     name='partner_name'
-                    value={formData.partner_name}
-                    onChange={handleChange}
+                    value={formData.partner_name ? formData.partner_name : searchTerm}
+                    onChange={handlePartnerChange}
                 />
+                {showSearchResults && (
+                    <ul className='search-results'>
+                        {filteredPartners.length > 0 ? (
+                            filteredPartners.map((partner) => (
+                                <li key={partner.id} onClick={() => selectPartner(partner)}>
+                                    {partner.name}
+                                </li>
+                            ))
+                        ) : (
+                            <button>Add New Partner</button>
+                        )}
+                    </ul>
+                )}
                 <label className='ride-details-label' htmlFor='partner_number'>Partner Number</label>
                 <input
                     className='ride-details-input'

@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import multer from 'multer'
 import {configDotenv} from 'dotenv'
 import UserModel from './models/UserModel.js'
 import DriverModel from './models/DriverModel.js'
@@ -11,9 +12,12 @@ import RidesModel from './models/RidesModel.js'
 import DailyLogsModel from './models/DailyLogsModel.js'
 import AttendanceModel from './models/AttendanceModel.js'
 import startDailyJobLog from './controllers/dailylogs.controller.js'
-configDotenv()
+import BackupModel from './models/BackupModel.js'
+configDotenv();
 
-const app = express()
+const app = express();
+
+const upload = multer();
 
 app.use(express.json())
 app.use(cors())
@@ -343,6 +347,28 @@ app.get('/get-vehicles-for-backup', authenticateToken, async(req, res) => {
    }
 })
 
+app.get('/partners', authenticateToken, async(req, res) => {
+    const {query} = req.query;
+
+    try{
+        const result = await UserModel.getVendors(query);
+        res.status(200).send(result)
+    } catch(error){
+        res.status(400).send("Error while searching vendors: " + error)
+    }
+})
+
+app.get('/search-drivers', authenticateToken, async(req, res) => {
+    const {query} = req.query;
+
+    try {
+        const result = await UserModel.getDrivers(query);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while searching drivers: " + error)
+    }
+})
+
 app.get('/search-vehicles', authenticateToken, async(req, res) => {
     const {query} = req.query;
 
@@ -353,6 +379,29 @@ app.get('/search-vehicles', authenticateToken, async(req, res) => {
         res.status(400).send("Error while searching vehicles: " + error)
     }
 })
+
+//Backup Routes
+app.get('/get-backup-details/:ride_id/:date', authenticateToken, async(req, res) => {
+    const {ride_id, date} = req.params;
+
+    try {
+        const result = await BackupModel.getBackupVehcileDetails(ride_id, date);
+        res.status(200).send(result);
+    } catch(error){
+        res.status(400).send("Error while getting backup details: " + error);
+    }
+})
+
+app.post('/add-backup', authenticateToken, upload.none(), async(req, res) => {
+    const {ride_id, date, vehicle_no, driver_id} = req.body;
+    try {
+        const result = await BackupModel.addBackup(ride_id, date, vehicle_no, driver_id);
+        res.status(201).send(result);
+    } catch (error) {
+        res.status(400).send("Error while adding backup: " + error)
+    }
+})
+
 //Initialize DB and Server
 const initializeDBAndServer = async () => {
     try {
@@ -364,6 +413,7 @@ const initializeDBAndServer = async () => {
         await RidesModel.createRidesModel();
         await DailyLogsModel.createDailyLogsTable();
         await AttendanceModel.createAttendanceTable();
+        await BackupModel.createBackupTable();
         app.listen(port, () => {
             //startDailyJobLog();
             console.log(`Sever is running on http://localhost:${port}`)

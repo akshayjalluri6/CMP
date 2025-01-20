@@ -4,8 +4,10 @@ import { GrUserWorker } from 'react-icons/gr';
 import { FaPhoneAlt, FaTruck, FaEdit } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5'; // Close icon
 import Cookies from 'js-cookie';
+import debounce from 'lodash.debounce';
 import 'react-time-picker/dist/TimePicker.css';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './DailyLog.css';
 
 const DailyLog = (props) => {
@@ -25,15 +27,18 @@ const DailyLog = (props) => {
 
     const [showPopup, setShowPopup] = useState(false); // State to control the popup
     const [searchTerm, setSearchTerm] = useState('');
+    const [driverSearchTerm, setDriverSearchTerm] = useState('');
     const [filteredVehicles, setFilteredVehicles] = useState([]);
     const [selectedBackupVehicle, setSelectedBackupVehicle] = useState(null); // Selected backup vehicle
+    const [filteredDrivers, setFilteredDrivers] = useState([]);
+    const [selectedDriver, setSelectedDriver] = useState(null); // Selected driver
     const navigate = useNavigate();
 
     const startDate = selectedDate;
     
 
     useEffect(() => {
-        const fetchDriverName = async () => {
+        const fetchDriverName = async (id) => {
             if (driver_id) {
                 try {
                     const response = await axios.get(`http://localhost:8080/get-user/${driver_id}`, {
@@ -80,18 +85,28 @@ const DailyLog = (props) => {
             }
         };
 
-        fetchDriverName();
-    }, [driver_id, vehicle_no, ride_id]);
+        const fetchBackupRideDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/get-backup-details/${ride_id}/${startDate}`, {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('jwt_token')}`,
+                    },
+                });
+                const data = response.data;
+                if (data.length > 0) {
+                    console.log("Backup ride details:", data);
+                    console.log("Backup vehicle:", data[0].vehicle_no);
+                    setSelectedBackupVehicle(data[0]);
+                    setSelectedDriver(data[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching backup ride details:", error);
+            }
+        }
 
-    const debounce = (func, delay) => {
-        let timeoutId;
-        return (...args) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                func(...args);
-            }, delay);
-        };
-    };
+        fetchDriverName();
+        fetchBackupRideDetails()
+    }, [driver_id, vehicle_no, ride_id, startDate]);
 
     const fetchFilteredVehicles = async (query) => {
         if(!query) {
@@ -110,12 +125,39 @@ const DailyLog = (props) => {
         }
     }
 
+    const fetchFilteredDrivers = async (query) => {
+        if(!query) {
+            setFilteredDrivers([]);
+            return;
+        }
+        try {
+            const response = await axios.get(`http://localhost:8080/search-drivers?query=${query}`, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('jwt_token')}`,
+                },
+            });
+            setFilteredDrivers(response.data)
+        } catch (error) {
+            console.error("Error fetching filtered drivers:", error);
+        }
+    }
+
     const debouncedFetchVehicles = debounce(fetchFilteredVehicles, 500)
 
-    const handleSearchInput = (e) => {
+    const debouncedFetchDrivers = debounce(fetchFilteredDrivers, 500)
+
+    const handleVehiclesSearchInput = (e) => {
         const query = e.target.value;
         setSearchTerm(query);
-        debouncedFetchVehicles(query);
+        setSelectedBackupVehicle(null);
+        debouncedFetchVehicles(query.toLowerCase());
+    }
+
+    const handleDriversSearchInput = (e) => {
+        const query = e.target.value;
+        setDriverSearchTerm(query);
+        setSelectedDriver(null);
+        debouncedFetchDrivers(query.toLowerCase());
     }
 
     const onStatusChange = (e) => {
@@ -141,6 +183,36 @@ const DailyLog = (props) => {
         setSearchTerm('')
         setFilteredVehicles([])
     };
+
+    const selectedBackupDriver = (driver) => {
+        setSelectedDriver(driver);
+        setDriverSearchTerm('');
+        setFilteredDrivers([]);
+    }
+
+    const onHandleBackupSubmit = (e) => {
+        e.preventDefault();
+        const backupData = {
+            ride_id,
+            date: startDate,
+            vehicle_no: selectedBackupVehicle.vehicle_no,
+            driver_id: selectedDriver.id,
+        }
+        const response = axios.post(`http://localhost:8080/add-backup`, backupData, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Cookies.get('jwt_token')}`,
+            },
+        });
+        toast.promise(response, {
+            pending: 'Adding backup...',
+            success: 'Backup added successfully',
+            error: 'Error adding backup',
+        });
+        
+        closePopup();
+    }
+
 
     const onRideDetails = () => {
         console.log('Ride details clicked');
@@ -214,6 +286,13 @@ const DailyLog = (props) => {
                     </p>
                 </div>
             )}
+            {selectedDriver && (
+                <div className="backup-section">
+                    <p>
+                        <strong>Backup Driver:</strong> {selectedDriver.driver_name} ({selectedDriver.phone_no})
+                    </p>
+                </div>
+            )}
             {showPopup && (
                 <div
                     className="popup-container"
@@ -229,12 +308,12 @@ const DailyLog = (props) => {
                         </div>
                         <div className="popup-content">
                             <h2>Select Backup Vehicle</h2>
-                            <form className='add-backup-form' onSubmit={(e) => e.preventDefault()}>
+                            <form className='add-backup-form' onSubmit={onHandleBackupSubmit}>
                                 <input 
                                     type='search' 
                                     placeholder='Search Vehicle' 
                                     value={selectedBackupVehicle ? selectedBackupVehicle.vehicle_no : searchTerm} 
-                                    onChange={handleSearchInput}
+                                    onChange={handleVehiclesSearchInput}
                                     className='search-input'
                                     required/>
                                 {filteredVehicles.length > 0 && (
@@ -252,7 +331,28 @@ const DailyLog = (props) => {
                                 {filteredVehicles.length === 0 && searchTerm && (
                                     <p className='no-results'>No Vehicles Found</p>
                                 )}
-                                <input type='search' placeholder='Search Driver'  required/>
+                                <input 
+                                type='search' 
+                                placeholder='Search Driver'  
+                                value={selectedDriver ? selectedDriver.name : driverSearchTerm}
+                                onChange={handleDriversSearchInput}
+                                className='search-input'
+                                required/>
+                                {filteredDrivers.length > 0 && (
+                                    <ul className='dropdown-list'>
+                                        {filteredDrivers.map(driver => (
+                                            <li key={driver.id}
+                                                onClick={() => selectedBackupDriver(driver)}
+                                                className='dropdown-item'
+                                                >
+                                                    {driver.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {filteredDrivers.length === 0 && driverSearchTerm && (
+                                    <p className='no-results'>No Drivers Found</p>
+                                )}
                                 <button type='submit'>Submit</button>
                             </form>
                         </div>

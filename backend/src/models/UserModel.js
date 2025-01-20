@@ -128,6 +128,36 @@ const UserModel = {
         } catch (error) {
             throw error
         }
+    },
+
+    async getDrivers(name) {
+        const query = `
+        SELECT * FROM users
+        WHERE role = 'driver' AND LOWER(name) Like $1;
+        `;
+
+        try {
+            const value = `${name}%`;
+            const result = await pool.query(query, [value]);
+            return result.rows;
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async getVendors(name) {
+        const query = `
+        SELECT * FROM users
+        WHERE role = 'vendor' AND LOWER(name) Like $1;
+        `;
+
+        try {
+            const value = `${name}%`;
+            const result = await pool.query(query, [value]);
+            return result.rows;
+        } catch (error) {
+            throw error;   
+        }
     }
 }
 
