@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GrUserWorker } from 'react-icons/gr';
 import { FaPhoneAlt, FaTruck, FaEdit } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5'; // Close icon
+import { DeleteOutlined } from '@ant-design/icons'; // Delete icon
 import Cookies from 'js-cookie';
 import debounce from 'lodash.debounce';
 import 'react-time-picker/dist/TimePicker.css';
@@ -186,6 +187,7 @@ const DailyLog = (props) => {
 
     const selectedBackupDriver = (driver) => {
         setSelectedDriver(driver);
+        console.log("Selected driver:", driver);
         setDriverSearchTerm('');
         setFilteredDrivers([]);
     }
@@ -198,6 +200,7 @@ const DailyLog = (props) => {
             vehicle_no: selectedBackupVehicle.vehicle_no,
             driver_id: selectedDriver.id,
         }
+        console.log("Backup data:", backupData);
         const response = axios.post(`http://localhost:8080/add-backup`, backupData, {
             headers: {
                 "Content-Type": "application/json",
@@ -279,17 +282,18 @@ const DailyLog = (props) => {
                     </div>
                 </div>
             </div>
-            {selectedBackupVehicle && (
-                <div className="backup-section">
+            <hr />
+            {selectedBackupVehicle && selectedBackupDriver && (
+                <div className='backup-section'>
+                    <div className='backup-header'>
+                        <h3>Backup Details</h3>
+                        <button type='button'><DeleteOutlined style={{ color: 'red', fontSize: '20px' }} /></button>
+                    </div>
                     <p>
                         <strong>Backup Vehicle:</strong> {selectedBackupVehicle.vehicle_no} ({selectedBackupVehicle.vehicle_model})
                     </p>
-                </div>
-            )}
-            {selectedDriver && (
-                <div className="backup-section">
                     <p>
-                        <strong>Backup Driver:</strong> {selectedDriver.driver_name} ({selectedDriver.phone_no})
+                        <strong>Backup Driver:</strong> {selectedDriver.driver_name} ({selectedDriver.driver_phone_no})
                     </p>
                 </div>
             )}
@@ -345,7 +349,7 @@ const DailyLog = (props) => {
                                                 onClick={() => selectedBackupDriver(driver)}
                                                 className='dropdown-item'
                                                 >
-                                                    {driver.name}
+                                                    {driver.name} - {driver.phone_no}
                                             </li>
                                         ))}
                                     </ul>

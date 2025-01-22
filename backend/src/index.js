@@ -394,6 +394,7 @@ app.get('/get-backup-details/:ride_id/:date', authenticateToken, async(req, res)
 
 app.post('/add-backup', authenticateToken, upload.none(), async(req, res) => {
     const {ride_id, date, vehicle_no, driver_id} = req.body;
+    console.log("Request Body:", req.body);
     try {
         const result = await BackupModel.addBackup(ride_id, date, vehicle_no, driver_id);
         res.status(201).send(result);

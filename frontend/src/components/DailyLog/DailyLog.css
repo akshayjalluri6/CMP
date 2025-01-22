@@ -281,3 +281,34 @@ button:hover {
     text-align: center;
     margin-top: 10px;
 }
+
+.backup-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.backup-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.backup-header button{
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.backup-section p{
+    text-align: left;
+}
+
+.delete-icon{
+    background: transparent;
+}

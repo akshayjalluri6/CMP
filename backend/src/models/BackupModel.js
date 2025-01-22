@@ -13,6 +13,7 @@ const BackupModel = {
         vehicle_no VARCHAR(255) NOT NULL,
         vehicle_model TEXT NOT NULL,
         driver_name TEXT NOT NULL,
+        driver_phone_no TEXT NOT NULL,
         vendor_name TEXT NOT NULL,
         amount INT NOT NULL,
         PRIMARY KEY (ride_id, date),
@@ -40,14 +41,15 @@ const BackupModel = {
         let vehicle_model = vehicle_details.vehicle_model;
         const driverDetails = await UserModel.getUserById(driver_id);
         let driver_name = driverDetails.name;
+        let driver_phone_no = driverDetails.phone_no;
         const query = `
-        INSERT INTO backup (ride_id, date, vehicle_no, vehicle_model, driver_name, vendor_name, amount)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
+        INSERT INTO backup (ride_id, date, vehicle_no, vehicle_model, driver_name, driver_phone_no, vendor_name, amount)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
         `;
 
         try {
             const start_date = new Date(date).toISOString().split('T')[0];
-            const value = [ride_id, start_date, vehicle_no, vehicle_model, driver_name, vendor_name, amount];
+            const value = [ride_id, start_date, vehicle_no, vehicle_model, driver_name, driver_phone_no, vendor_name, amount];
             await pool.query(query, value);
             await DriverModel.updateDriverStatus(driver_id, "busy");
             await VehicleModel.updateVehicleStatus(vehicle_no, "busy");
