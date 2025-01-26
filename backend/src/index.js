@@ -155,17 +155,6 @@ app.put('/supervisor/update-vehicle-info/:id', authenticateToken, async(req, res
     }
 })
 
-app.post('/supervisor/add-ride', authenticateToken, async(req, res) => {
-    const {client_name, duration, cost_per_day} = req.body;
-
-    try {
-        const result = await RidesModel.addRides(client_name, duration, cost_per_day);
-        res.status(201).send(result);
-    } catch (error) {
-        res.status(400).send("Error while adding ride: " + error)
-    }
-})
-
 app.get('/supervisor/drivers', authenticateToken, async(req, res) => {
     try {
         const result = await UserModel.getDrivers();
@@ -224,6 +213,17 @@ app.post('/register-manager', authenticateToken, async(req, res) => {
         res.status(201).send("Your Manager account created successfully with id: " + user_id);
     } catch (error) {
         res.status(400).send("Error while registering manager: " + error)
+    }
+})
+
+app.post('/manager/add-ride', authenticateToken, async(req, res) => {
+    const {client_name, duration, cost_per_day, total_kms} = req.body;
+
+    try {
+        const result = await RidesModel.addRides(client_name, duration, cost_per_day, total_kms);
+        res.status(201).send(result);
+    } catch (error) {
+        res.status(400).send("Error while adding ride: " + error)
     }
 })
 
