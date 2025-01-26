@@ -3,6 +3,7 @@ import DriverModel from "./DriverModel.js";
 import VehicleModel from "./VehicleModel.js";
 import RidesModel from "./RidesModel.js";
 import UserModel from "./UserModel.js";
+import DailyLogsModel from "./DailyLogsModel.js";
 
 const BackupModel = {
     async createBackupTable() {
@@ -31,9 +32,11 @@ const BackupModel = {
     },
 
     async addBackup(ride_id, date, vehicle_no, driver_id) {
+        let status = await DailyLogsModel.getRideDetails(ride_id, date);
+        status = status[0].log_status;
         let price = await RidesModel.getRideById(ride_id);
         price = price.cost_per_day;
-        const amount = price / 2;
+        const amount = (status === ("Half Day Absent" || "Schedule Vendor Half Day Replacement")) ? price / 2 : price;
         const vehicle_details = await VehicleModel.getVehicleDetails(vehicle_no);
         let vendor_id = vehicle_details.vendor_id;
         let vendor_details = await UserModel.getUserById(vendor_id);
