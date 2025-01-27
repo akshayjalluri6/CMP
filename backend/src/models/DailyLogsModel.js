@@ -31,21 +31,6 @@ const DailyLogsModel = {
         }
     },
 
-    async getDailyLogs(){
-        const query = `
-        SELECT * FROM daily_logs;
-        `;
-        console.log("Hello")
-
-        try {
-            const result = await pool.query(query);
-            console.log(result)
-            return result.rows;
-        } catch (error) {
-            throw error
-        }
-    },
-
     async getLogs (){
         const query = `
         SELECT * FROM daily_logs;
@@ -54,6 +39,21 @@ const DailyLogsModel = {
         try {
             const result = await pool.query(query);
             return result.rows
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getDailyLogsById(id){
+        const query = `
+        SELECT * FROM daily_logs
+        WHERE ride_id = $1;
+        `;
+
+        try {
+            const values = [id];
+            const result = await pool.query(query, values);
+            return result.rows;
         } catch (error) {
             throw error;
         }

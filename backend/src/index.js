@@ -227,6 +227,17 @@ app.post('/manager/add-ride', authenticateToken, async(req, res) => {
     }
 })
 
+app.get('/manager/ride/:id', authenticateToken, async(req, res) => {
+    const {id} = req.params;
+
+    try {
+        const result = await DailyLogsModel.getDailyLogsById(id);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting ride details: " + error)
+    }
+})
+
 //Common Routes
 app.get('/vendor-vehicles', authenticateToken, async(req, res) => {
     const {vehicle_no} = req.body;

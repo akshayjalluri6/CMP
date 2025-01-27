@@ -4,7 +4,7 @@ import Home from "../Home/Home";
 import axios from "axios";
 import './manager.css'
 import Cookies from "js-cookie";
-import RideItem from "../RideItem/RideItem";
+import RideItem from "./RideItem/RideItem";
 import {toast} from 'react-toastify'
 
 const Manager = () => {
@@ -86,7 +86,7 @@ const Manager = () => {
             </div>
             <ul className="rides-list-container">
                 {formData && formData.map((ride, index) => (
-                    <RideItem key={index} ride={ride} />
+                    <RideItem key={ride.id} ride={ride} />
                 ))}
             </ul>
             {addRidePopup && (

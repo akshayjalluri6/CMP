@@ -5,6 +5,7 @@ import Home from './components/Home/Home';
 import Manager from './components/Manager/manager';
 import Supervisor from './components/Supervisor/supervisor';
 import RideDetails from './components/RideDetails/RideDetails';
+import ManagerRideDetails from './components/Manager/RideDetails/RideDetails';
 import Register from './components/Register/Register';
 
 const routes = [
@@ -13,6 +14,7 @@ const routes = [
   { path: "/manager", element: <Manager /> },
   { path: "/supervisor", element: <Supervisor /> },
   { path: "/ride-details/:ride_id/:date", element: <RideDetails /> },
+  { path: "manager/ride-details/:ride_id", element: <ManagerRideDetails />},
   { path: "/register", element: <Register /> },
 ];
 

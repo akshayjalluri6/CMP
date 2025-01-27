@@ -10,6 +10,7 @@ const RidesModel = {
         remaining_days INT DEFAULT 0,
         cost_per_day FLOAT NOT NULL,
         total_kms FLOAT DEFAULT 0,
+        ride_status VARCHAR(255),
         remarks VARCHAR(255),
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()

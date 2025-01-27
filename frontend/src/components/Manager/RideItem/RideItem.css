@@ -1,5 +1,5 @@
 .ride-item{
-    padding: 20px;
+    padding: 15px;
     border: 1px solid black;
     border-radius: 5px;
     margin-bottom: 10px;
@@ -29,4 +29,9 @@
 .remaining-days{
     color: red;
     font-weight: bold;
+}
+
+.ride-item div p {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
