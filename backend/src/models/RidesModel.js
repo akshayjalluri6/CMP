@@ -44,8 +44,8 @@ const RidesModel = {
 
     async addRides(client_name, duration, cost_per_day, total_kms){
         const query = `
-        INSERT INTO rides(client_name, duration, cost_per_day, total_kms)
-        VALUES($1, $2, $3, $4);
+        INSERT INTO rides(client_name, duration, cost_per_day, total_kms, ride_status)
+        VALUES($1, $2, $3, $4, 'pending');
         `;
 
         try {
@@ -95,6 +95,23 @@ const RidesModel = {
         try {
             const result = await pool.query(query);
             return result.rows
+        } catch (error) {
+            throw error
+        }
+    },
+
+    async updateRideStatus(ride_id, status){
+        const query = `
+        UPDATE rides
+        SET ride_status = $1
+        WHERE id = $2;
+        `;
+
+        try {
+            const values = [status, ride_id];
+            await pool.query(query, values);
+            console.log(`Ride status updated to ${status}`);
+            return "Ride status updated successfully";
         } catch (error) {
             throw error
         }

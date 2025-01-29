@@ -11,8 +11,8 @@ const DailyLogsModel = {
         start_date DATE NOT NULL,
         start_time TIME,
         end_time TIME,
-        vehicle_no VARCHAR(255) NOT NULL,
-        driver_id UUID NOT NULL,
+        vehicle_no VARCHAR(255),
+        driver_id UUID,
         vendor_id UUID,
         log_status VARCHAR(255) NOT NULL DEFAULT 'present',
         PRIMARY KEY (ride_id, start_date),
@@ -71,6 +71,22 @@ const DailyLogsModel = {
             return result.rows 
         } catch (error) {
             throw error
+        }
+    },
+
+    async addIntialLog(ride_id, start_date){
+        const query = `
+        INSERT INTO daily_logs (ride_id, start_date)
+        VALUES ($1, $2);
+        `;
+
+        try {
+            const values = [ride_id, start_date];
+            await pool.query(query, values);
+            await RidesModel.updateRideStatus(ride_id, start_date);
+            return "Initial log added successfully";
+        } catch (error) {
+            throw error;
         }
     },
 

@@ -263,7 +263,7 @@ const DailyLog = (props) => {
                     <label>Vehicle Details</label>
                     <div>
                         <GrUserWorker />
-                        <p>{vehicle_no.toUpperCase()}</p>
+                        <p>{vehicle_no?.toUpperCase() || 'N/A'}</p>
                     </div>
                     <div>
                         <FaTruck />
@@ -274,7 +274,7 @@ const DailyLog = (props) => {
                     <label>Driver Details</label>
                     <div>
                         <GrUserWorker />
-                        <p>{driverName.toUpperCase()}</p>
+                        <p>{driverName?.toUpperCase() || 'N/A'}</p>
                     </div>
                     <div>
                         <FaPhoneAlt />

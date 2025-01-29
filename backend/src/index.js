@@ -227,6 +227,17 @@ app.post('/manager/add-ride', authenticateToken, async(req, res) => {
     }
 })
 
+app.post('/manager/add-initial-ride', authenticateToken, async(req, res) => {
+    const {ride_id, start_date} = req.body;
+
+    try {
+        const result = await DailyLogsModel.addIntialLog(ride_id, start_date);
+        res.status(201).send(result);
+    } catch (error) {
+        res.status(400).send("Error while adding initial ride: " + error)
+    }
+})
+
 app.get('/manager/ride/:id', authenticateToken, async(req, res) => {
     const {id} = req.params;
 
