@@ -13,6 +13,7 @@ import DailyLogsModel from './models/DailyLogsModel.js'
 import AttendanceModel from './models/AttendanceModel.js'
 import startDailyJobLog from './controllers/dailylogs.controller.js'
 import BackupModel from './models/BackupModel.js'
+import AdHOCRidesModel from './models/AdHOCRidesModel.js'
 configDotenv();
 
 const app = express();
@@ -200,6 +201,31 @@ app.post('/supervisor/end-ride/:id', authenticateToken, async(req, res) => {
         res.status(201).send(result);
     } catch (error) {
         res.status(400).send(`${error}`)
+    }
+})
+
+//Supervisor Routes - AdHOC
+
+app.get('/supervisor/get-rides', authenticateToken, async(req, res) => {
+    const {date} = req.query;
+
+    try {
+        const result = {
+            rides: date ? await AdHOCRidesModel.getRidesByDate(date) : await AdHOCRidesModel.getRides()
+        }
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(400).send("Error while getting rides: " + error)
+    }
+})
+
+app.post('/supervisor/add-ride', authenticateToken, async(req, res) => {
+    const {client_name, client_phone_no, vehicle_no, driver_name, price, date} = req.body;
+    try {
+        const result = await AdHOCRidesModel.addRide(client_name, client_phone_no, vehicle_no, driver_name, price, date);
+        res.status(201).send(result);
+    } catch (error) {
+        res.status(400).send("Error while adding ride: " + error)
     }
 })
 
@@ -437,6 +463,7 @@ const initializeDBAndServer = async () => {
         await DailyLogsModel.createDailyLogsTable();
         await AttendanceModel.createAttendanceTable();
         await BackupModel.createBackupTable();
+        await AdHOCRidesModel.createAdHOCRidesTable();
         app.listen(port, () => {
             //startDailyJobLog();
             console.log(`Sever is running on http://localhost:${port}`)

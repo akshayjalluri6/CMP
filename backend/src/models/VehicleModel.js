@@ -6,8 +6,8 @@ const VehicleModel = {
         const query = `
         CREATE TABLE IF NOT EXISTS vehicles(
         vehicle_no VARCHAR(255) PRIMARY KEY,
-        vehicle_type VARCHAR(255) NOT NULL,
-        vehicle_model VARCHAR(255) NOT NULL,
+        vehicle_type VARCHAR(255),
+        vehicle_model VARCHAR(255),
         vendor_id UUID,
         status text NOT NULL DEFAULT 'available',
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),

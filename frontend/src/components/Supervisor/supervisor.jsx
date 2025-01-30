@@ -6,6 +6,7 @@ import DailyLog from '../DailyLog/DailyLog';
 import { DatePicker } from 'antd';
 import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Supervisor = () => {
     const navigate = useNavigate();
@@ -21,7 +22,22 @@ const Supervisor = () => {
 
     // Popup state
     const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [newRideData, setNewRideData] = useState({ vehicle_no: '', driver_id: '' }); // Form data for the popup
+    const [newRideData, setNewRideData] = useState({
+        client_name: '',
+        client_phone_no: '',
+        vehicle_no: '',
+        driver_name: '',
+        price: '',
+        date: new Date()
+    })
+    const [newVehicleData, setNewVehicleData] = useState({
+        vehicle_no: '',
+        vehicle_type: '',
+        vehicle_model: ''
+    }); // Form data for the popup
+    const [selectedOption, setSelectedOption] = useState('0');
+
+
 
     // Fetch today's logs on component mount
     useEffect(() => {
@@ -113,6 +129,10 @@ const Supervisor = () => {
         fetchLogsByDate(dateString);
     };
 
+    const onChangeSelectedOption = (e) => {
+        setSelectedOption(e.target.value);
+    };
+
     // Update log
     const handleLogUpdate = async (log_id, start_time, log_status) => {
         try {
@@ -160,7 +180,7 @@ const Supervisor = () => {
     // Close the popup
     const handleClosePopup = () => {
         setIsPopupVisible(false);
-        setNewRideData({ vehicle_no: '', driver_id: '' }); // Reset form data
+        setNewVehicleData({ vehicle_no: '', driver_id: '' }); // Reset form data
     };
 
     const handleLogout = () => {
@@ -172,25 +192,26 @@ const Supervisor = () => {
     const handleSubmitNewRide = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`http://localhost:8080/add-ride`, newRideData, {
+            const { client_name, client_phone_no, vehicle_no, driver_name, price, date} = newRideData
+            const formattedDate = date.toISOString().split('T')[0];
+            const response = await axios.post('http://localhost:8080/supervisor/add-ride', {
+                client_name,
+                client_phone_no,
+                vehicle_no,
+                driver_name,
+                price,
+                date: formattedDate
+            }, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${Cookies.get('jwt_token')}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${Cookies.get('jwt_token')}`,
                 }
             });
-            console.log('New ride added:', response.data);
-            handleClosePopup(); // Close popup after successful submission
-            fetchLogsByDate(selectedDate); // Refresh logs
+            console.log(response.data);
         } catch (error) {
-            console.error('Error adding ride:', error);
+            console.log(error)
         }
-    };
-
-    // Handle form input changes
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewRideData((prev) => ({ ...prev, [name]: value }));
-    };
+    }
 
     return (
         <div className='bg-container'>
@@ -235,7 +256,7 @@ const Supervisor = () => {
                 <div>
                     <h1>Daily Rides</h1>
                     <button type='button' className='add-ride-button' onClick={handleAddRide}>
-                        <PlusCircleOutlined className='add-ride-icon' /> Add Vehicle
+                        <PlusCircleOutlined className='add-ride-icon' /> Add
                     </button>
                 </div>
                 {formData.length > 0 ? (
@@ -262,35 +283,31 @@ const Supervisor = () => {
         }}
     >
         <div className="popup-box">
-            <div className="popup-header">
-                <h2>Add Vehicle</h2>
-                <button onClick={handleClosePopup} className="close-popup">
-                    &times;
-                </button>
-            </div>
-            <form id="add-ride-form" onSubmit={handleSubmitNewRide} className="popup-content">
-                <label htmlFor="vehicle_no">Vehicle Number:</label>
-                <input
-                    type="text"
-                    id="vehicle_no"
-                    name="vehicle_no"
-                    value={newRideData.vehicle_no}
-                    onChange={handleInputChange}
-                    required
-                />
-                <label htmlFor="driver_id">Driver ID:</label>
-                <input
-                    type="text"
-                    id="driver_id"
-                    name="driver_id"
-                    value={newRideData.driver_id}
-                    onChange={handleInputChange}
-                    required
-                />
-                <button type="submit" className="submit-button">
-                    Add Vehicle
-                </button>
-            </form>
+            <select value={selectedOption} onChange={onChangeSelectedOption}>
+                <option value="0">Add New Ride</option>
+                <option value="1">Add New Vehicle</option>
+            </select>
+            {selectedOption === '0' ? (
+                <div>
+                    <form className='popup-content' onSubmit={handleSubmitNewRide}>
+                        <input type='text' placeholder='Enter Client Name' name='client_name' onChange={e => { setNewRideData({ ...newRideData, client_name: e.target.value })}} />
+                        <input type='text' placeholder='Enter Client Phone No' name='client_phone_no' onChange={e => { setNewRideData({ ...newRideData, client_phone_no: e.target.value })}} />
+                        <input type="text" placeholder='Enter Vehicle Number' name="vehicle_number" onChange={e => { setNewRideData({ ...newRideData, vehicle_number: e.target.value })}} />
+                        <input type="text" placeholder='Enter Driver Name' name="driver_name" onChange={e => { setNewRideData({ ...newRideData, driver_name: e.target.value })}} />
+                        <input type='text' placeholder='Enter Price' name ='price' onChange={e => { setNewRideData({ ...newRideData, price: e.target.value })}} />
+                        <button type='submit' className='submit-button'> Submit </button>
+                    </form>
+                </div>
+            ) : (
+                <div>
+                    <form className='popup-content'>
+                        <input type='text' placeholder='Enter Vehicle Number' name='vehicle_number' onChange={e => { setNewVehicleData({ ...newVehicleData, vehicle_number: e.target.value })}} />
+                        <input type='text' placeholder='Enter Vehicle Type' name='vehicle_type' onChange={e => { setNewVehicleData({ ...newVehicleData, vehicle_type: e.target.value })}} />
+                        <input type='text' placeholder='Enter Vehicle Model' name='vehicle_model' onChange={e => { setNewVehicleData({ ...newVehicleData, vehicle_model: e.target.value })}} />
+                        <button type='submit' className='submit-button'> Submit </button>
+                    </form>
+                </div>
+            )}
         </div>
     </div>
 )}
